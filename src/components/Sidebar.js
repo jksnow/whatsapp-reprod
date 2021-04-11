@@ -12,6 +12,41 @@ const Sidebar = () => {
     const [rooms, setRooms] = useState([]);
     const [{user}, dispatch] = useStateValue();
 
+    const [input, setInput] = useState('');
+
+    const [roomNames, setRoomNames] = useState(["nothing"]); 
+
+    let suggestion = [];
+
+    const [filteredRooms, setFilteredRooms] = useState([]);
+
+    const autocomplete = (e) => {
+        setInput(e.target.value);
+        roomNames.forEach(x=> {
+            if(x.substr(0, e.target.value.length).toUpperCase() === e.target.value.toUpperCase()) {
+                suggestion.push(x);
+
+                console.log(suggestion);
+            }
+        })
+        
+        
+        setFilteredRooms(rooms.filter(item => suggestion.includes(item.data.name)));
+    }
+
+
+    useEffect(()=>{
+        let roomNamesArray = [];
+        rooms.map(room=>(
+            roomNamesArray = [
+            ...roomNamesArray,
+            room.data.name
+            ]))
+        setRoomNames(roomNamesArray);
+        setFilteredRooms(rooms);
+        
+    },[rooms])
+
     useEffect(()=>{
         const unsubscribe = db.collection('rooms').onSnapshot(snapshot => (
             setRooms(snapshot.docs.map(doc=>
@@ -20,10 +55,11 @@ const Sidebar = () => {
                     data: doc.data()
                 })
             ))
-        ));
+        ))
         return () => {
             unsubscribe();
         }
+        
     },[])
 
     return (
@@ -46,13 +82,13 @@ const Sidebar = () => {
             <div className="sidebar__search">
                 <div className="sidebar__searchContainer">
                     <SearchOutlined />
-                    <input type="text" placeholder="Search or start new chat" />
+                    <input onChange={(e) => autocomplete(e)} type="text" placeholder="Search Room Name" />
                 </div>
             </div>
 
             <div className="sidebar__chats">
                 <SidebarChat addNewChat />
-                {rooms.map(room=>(
+                {filteredRooms.map(room=>(
                     <SidebarChat key={room.id} id={room.id} name={room.data.name} />
                 ))}
             </div>
