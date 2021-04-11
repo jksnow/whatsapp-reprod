@@ -6,7 +6,7 @@ import {useStateValue} from '../StateProvider'
 import {actionTypes} from '../Reducer'
 
 const Login = () => {
-
+    
     const [{}, dispatch] = useStateValue();
 
     const signIn = () => {
@@ -16,8 +16,19 @@ const Login = () => {
                 type: actionTypes.SET_USER,
                 user: result.user
             });
+            console.log(dispatch);
+            console.log(result.user);
         })
         .catch((error) => alert(error.message));
+    }
+
+    const signInAnon = () => {
+        dispatch({
+            type: actionTypes.SET_USER,
+            user: {
+                displayName: "Anonymous User"
+            }
+        });
     }
 
     return (
@@ -30,10 +41,16 @@ const Login = () => {
                 <div className="login__text">
                     <h1>Sign in</h1>
                 </div>
-                
-                <Button type="submit" onClick={signIn}>
-                    Sign in with Google
-                </Button>
+                <div>
+                    <Button type="submit" onClick={signIn}>
+                        Sign in with Google
+                    </Button>
+                </div>
+                <div>
+                    <Button type="submit" onClick={signInAnon}>
+                        Sign in anonymously
+                    </Button>
+                </div>
             </div>
         </div>
     )
